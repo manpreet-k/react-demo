@@ -63,10 +63,6 @@ class App extends Component {
           <Route path="/add" component={AddNewRow}/>
           <Route path="/edit" component={EditExistingRow}/>
           <Route path="/delete" component={DeleteExistingRow}/>
-        {/* </Route> */}
-         {/* <Route path="/add" component={AddNewRow}/>
-         <Route path="/edit" component={EditExistingRow}/>
-         <Route path="/delete" component={DeleteExistingRow}/> */}
          </div>
          </Router>
 
@@ -80,11 +76,16 @@ class AddNewRow extends Component {
   
     constructor() {
       super();
+      this.goBack = this.goBack.bind(this);
       this.state = {
         name: '',
         id: '',
         regions: ''
       };
+    }
+
+    goBack(){
+      this.props.history.goBack();
     }
   
     onChange = (e) => {
@@ -98,42 +99,64 @@ class AddNewRow extends Component {
                       "id" : this.state.id,
                       "regions" : this.state.regions}
       myData.data.push(newJson);
+      this.goBack();
     }
   
     render(){        
         return (
-          <div>
+          <div padding = "135px">
           <h3>Add record</h3>
-          <form>
-          <input type="text" name="name" onChange={this.onChange} />
-          <input type="text" name="id" onChange={this.onChange} />
-          <input type="text" name="regions" onChange={this.onChange} />
-          <button type = "submit" name="submit" onClick={this.handleOnClick.bind(this)}> Submit </button>
-        </form>
+            <form>
+              Name:<br/>
+              <input type="text" name="name" onChange={this.onChange}/><br/>
+              Id: <br/>
+              <input type="text" name="id" onChange={this.onChange}/><br/>
+              Regions: <br/>
+              <input type="text" name="regions" onChange={this.onChange}/><br/><br/>
+              <input type="submit" value="Submit" onClick={this.handleOnClick.bind(this)}/>
+              &nbsp;&nbsp;<input type="submit" value = "Back" onClick={this.goBack}/>
+          </form> 
         </div>)
     }
   }
 
 // More components
 class DeleteExistingRow extends Component {
+  constructor(props){
+    super(props);
+    this.goBack = this.goBack.bind(this); 
+  }
+  goBack(){
+    this.props.history.goBack();
+  }
   render(){
     if( myData.index !== -1){
-      var row = myData.data[index];
+      var row = myData.data[myData.index];
       var jsonData = myData.data;
-      jsonData.splice(index,1);
+      jsonData.splice(myData.index,1);
       myData.data = jsonData;
       myData.index = -1;
       
       return (
-        <div>
-        <h3>Delete record</h3>
-        <h4> Name: {row.name} </h4>
-        <h4> Regions: {row.regions} </h4>
-        <h4> ID: {row.id} </h4>
-      </div>)
+         <div>
+        <h3>Deleted record</h3>
+            <form>
+              Name:<br/>
+              <input readonly type="text" name="name" value = {row.name}/><br/>
+              Id: <br/>
+              <input readonly type="text" name="id" value = {row.id}/><br/>
+              Regions: <br/>
+              <input readonly type="text" name="regions" value = {row.regions}/><br/><br/>
+              <input type="submit" value = "Back" onClick={this.goBack}/>
+          </form> 
+      </div>);
     }
     else{
-      return (<h1>Select a record to delete!</h1>);
+      return (
+      <div>
+        <h3>Select a record to delete!</h3>
+        <input type="submit" value = "Back" onClick={this.goBack}/>
+        </div>);
     }
   }
 }
@@ -144,6 +167,7 @@ class EditExistingRow extends Component {
   constructor(props){
     super(props);
     var index = myData.index;
+    this.goBack = this.goBack.bind(this); 
     this.state = {
       name: '',
       id: '',
@@ -162,6 +186,10 @@ class EditExistingRow extends Component {
                     "id" : this.state.id,
                     "regions" : this.state.regions}
     myData.data.push(newJson);
+  }
+
+  goBack(){
+    this.props.history.goBack();
   }
 
   render(){
@@ -183,15 +211,19 @@ class EditExistingRow extends Component {
         <div>
         <h3>Edit record</h3>
         <form>
-        <input type="text" name="name" value={this.state.name} onChange={this.onChange.bind(this)} />
-        <input type="text" name="id" value={this.state.id} onChange={this.onChange.bind(this)} />
-        <input type="text" name="regions" value={this.state.regions} onChange={this.onChange.bind(this)} />
-        <button type = "submit" name="submit" onClick={this.handleOnClick.bind(this)}> Submit </button>
-      </form>
+              Name:<br/>
+              <input type="text" name="name" value={this.state.name} onChange={this.onChange}/><br/>
+              Id: <br/>
+              <input type="text" name="id" value={this.state.id} onChange={this.onChange}/><br/>
+              Regions: <br/>
+              <input type="text" name="regions" value={this.state.regions} onChange={this.onChange}/><br/><br/>
+              <input type="submit" value="Submit" onClick={this.handleOnClick.bind(this)}/>
+              &nbsp;&nbsp;<input type="submit" value = "Back" onClick={this.goBack}/>
+          </form> 
       </div>)
     }
     else {
-      return (<h3>Select a record to edit!</h3>);
+      return (<div><h3>Select a record to edit!</h3><input type="submit" value = "Back" onClick={this.goBack}/></div>);
     }
   }
 }
