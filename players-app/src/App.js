@@ -1,9 +1,20 @@
 import React, { Component } from 'react';
 import playersData from './data/players.json';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import './index.css';
+
+const myData = {
+  data: playersData,
+  index: -1
+}
 
 class App extends Component {
-  
+
+  rowClickHandler = (row, columnIndex, rowIndex, e) => {
+    myData.index = rowIndex
+  }
+
   render() {
 
     const options = {
@@ -17,7 +28,7 @@ class App extends Component {
       }, {
         text: '40', value: 40
       }, {
-        text: 'All', value: playersData.length
+        text: 'All', value: myData.data.length
       } ], // you can change the dropdown list for size per page
       sizePerPage: 10,  // which size per page you want to locate as default
       pageStartIndex: 1, // where to start counting the pages
@@ -30,19 +41,153 @@ class App extends Component {
       nextPageTitle: 'Go to next', // Next page button title
       firstPageTitle: 'Go to first', // First page button title
       lastPageTitle: 'Go to Last', // Last page button title
-      paginationPosition: 'bottom'  // default is bottom, top and both is all available
+      paginationPosition: 'bottom',  // default is bottom, top and both is all available
+      onRowClick: this.rowClickHandler
     };
-
 
     return (
       <div padding= "35px">
-        <BootstrapTable data={ playersData } striped={true} pagination={ true } options={ options }>
+        <BootstrapTable data={myData.data } striped={true} pagination={ true } options={ options } >
         <TableHeaderColumn dataField='id' width="34%" isKey={ true }>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='name' width="33%" filter={ { type: 'TextFilter', delay: 10 } }>Name</TableHeaderColumn>
         <TableHeaderColumn dataField='regions' width="33%" filter={ { type: 'TextFilter', delay: 10 } }>Regions</TableHeaderColumn>
     </BootstrapTable>
+
+    <Router>
+          <div>
+            <ul>
+          <li><Link to="/add">Add</Link></li>
+          <li><Link to="/edit" >Edit</Link></li>
+          <li><Link to="/delete">Delete</Link></li>
+          </ul>
+          <Route path="/add" component={AddNewRow}/>
+          <Route path="/edit" component={EditExistingRow}/>
+          <Route path="/delete" component={DeleteExistingRow}/>
+        {/* </Route> */}
+         {/* <Route path="/add" component={AddNewRow}/>
+         <Route path="/edit" component={EditExistingRow}/>
+         <Route path="/delete" component={DeleteExistingRow}/> */}
+         </div>
+         </Router>
+
       </div>
     );
+  }
+}
+
+// More components
+class AddNewRow extends Component {
+  
+    constructor() {
+      super();
+      this.state = {
+        name: '',
+        id: '',
+        regions: ''
+      };
+    }
+  
+    onChange = (e) => {
+      const state = this.state
+      state[e.target.name] = e.target.value;
+      this.setState(state);
+    }
+  
+    handleOnClick = () => {
+      var newJson = {"name" : this.state.name,
+                      "id" : this.state.id,
+                      "regions" : this.state.regions}
+      myData.data.push(newJson);
+    }
+  
+    render(){        
+        return (
+          <div>
+          <h3>Add record</h3>
+          <form>
+          <input type="text" name="name" onChange={this.onChange} />
+          <input type="text" name="id" onChange={this.onChange} />
+          <input type="text" name="regions" onChange={this.onChange} />
+          <button type = "submit" name="submit" onClick={this.handleOnClick}> Submit </button>
+        </form>
+        </div>)
+    }
+  }
+
+// More components
+class DeleteExistingRow extends Component {
+  render(){
+    var index = myData.index;
+    if(index !== -1){
+      var row = myData.data[index];
+      var jsonData = myData.data;
+      jsonData = jsonData.splice(index,1);
+      myData.data = jsonData;
+      myData.index = -1;
+      
+      return (
+        <div>
+        <h3>Delete record</h3>
+        <h4> Name: {row.name} </h4>
+        <h4> Regions: {row.regions} </h4>
+        <h4> ID: {row.id} </h4>
+      </div>)
+    }
+    else{
+      return (<h1>Select a record to delete!</h1>);
+    }
+  }
+}
+
+// More components
+class EditExistingRow extends Component {
+
+  componentDidMount(){
+    var index = myData.index;
+    this.setState({
+      name: '',
+      id: '',
+      regions: '',
+      index: index,
+      data: myData
+    });
+  }
+
+  onChange = (e) => {
+    const state = this.state
+    state[e.target.name] = e.target.value;
+    this.setState(state);
+  }
+
+  handleOnClick = () => {
+    var newJson = {"name" : this.state.name,
+                    "id" : this.state.id,
+                    "regions" : this.state.regions}
+    myData.data.push(newJson);
+  }
+
+  render(){
+    if(this.state !== null && this.state.index !== -1){
+      var row = myData.data[this.state.index];
+      var jsonData = myData.data;
+      jsonData = jsonData.splice(this.state.index,1);
+      myData.data = jsonData;
+      myData.index = -1;
+      
+      return (
+        <div>
+        <h3>Edit record</h3>
+        <form>
+        <input type="text" name="name" value={row.name} onChange={this.onChange} />
+        <input type="text" name="id" value={row.id} onChange={this.onChange} />
+        <input type="text" name="regions" value={row.regions} onChange={this.onChange} />
+        <button type = "submit" name="submit" onClick={this.handleOnClick}> Submit </button>
+      </form>
+      </div>)
+    }
+    else{
+      return (<h3>Select a record to edit!</h3>);
+    }
   }
 }
 
