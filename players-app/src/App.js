@@ -108,7 +108,7 @@ class AddNewRow extends Component {
           <input type="text" name="name" onChange={this.onChange} />
           <input type="text" name="id" onChange={this.onChange} />
           <input type="text" name="regions" onChange={this.onChange} />
-          <button type = "submit" name="submit" onClick={this.handleOnClick}> Submit </button>
+          <button type = "submit" name="submit" onClick={this.handleOnClick.bind(this)}> Submit </button>
         </form>
         </div>)
     }
@@ -117,11 +117,10 @@ class AddNewRow extends Component {
 // More components
 class DeleteExistingRow extends Component {
   render(){
-    var index = myData.index;
-    if(index !== -1){
+    if( myData.index !== -1){
       var row = myData.data[index];
       var jsonData = myData.data;
-      jsonData = jsonData.splice(index,1);
+      jsonData.splice(index,1);
       myData.data = jsonData;
       myData.index = -1;
       
@@ -142,15 +141,14 @@ class DeleteExistingRow extends Component {
 // More components
 class EditExistingRow extends Component {
 
-  componentDidMount(){
+  constructor(props){
+    super(props);
     var index = myData.index;
-    this.setState({
+    this.state = {
       name: '',
       id: '',
-      regions: '',
-      index: index,
-      data: myData
-    });
+      regions: ''
+    };
   }
 
   onChange = (e) => {
@@ -167,25 +165,32 @@ class EditExistingRow extends Component {
   }
 
   render(){
-    if(this.state !== null && this.state.index !== -1){
-      var row = myData.data[this.state.index];
+   
+    var myIndex = myData.index;
+   
+    if(myIndex !== -1){
+      var row = myData.data[myIndex];
       var jsonData = myData.data;
-      jsonData = jsonData.splice(this.state.index,1);
+      jsonData.splice(myIndex,1);
       myData.data = jsonData;
       myData.index = -1;
-      
+      this.state.regions = row.regions;
+      this.state.name = row.name;
+      this.state.id = row.id;
+    }
+    if(this.state.id !== ""){
       return (
         <div>
         <h3>Edit record</h3>
         <form>
-        <input type="text" name="name" value={row.name} onChange={this.onChange} />
-        <input type="text" name="id" value={row.id} onChange={this.onChange} />
-        <input type="text" name="regions" value={row.regions} onChange={this.onChange} />
-        <button type = "submit" name="submit" onClick={this.handleOnClick}> Submit </button>
+        <input type="text" name="name" value={this.state.name} onChange={this.onChange.bind(this)} />
+        <input type="text" name="id" value={this.state.id} onChange={this.onChange.bind(this)} />
+        <input type="text" name="regions" value={this.state.regions} onChange={this.onChange.bind(this)} />
+        <button type = "submit" name="submit" onClick={this.handleOnClick.bind(this)}> Submit </button>
       </form>
       </div>)
     }
-    else{
+    else {
       return (<h3>Select a record to edit!</h3>);
     }
   }
