@@ -10,8 +10,8 @@ class App extends Component {
         <BootstrapTable data={ playersData } pagination={ true }
         >
         <TableHeaderColumn dataField='id' isKey={ true }> ID</TableHeaderColumn>
-        <TableHeaderColumn dataField='name'> Name</TableHeaderColumn>
-        <TableHeaderColumn dataField='regions'>Regions</TableHeaderColumn>
+        <TableHeaderColumn dataField='name' filter={ { type: 'TextFilter', delay: 10 } }> Name</TableHeaderColumn>
+        <TableHeaderColumn dataField='regions' filter={ { type: 'TextFilter', delay: 10 } }>Regions</TableHeaderColumn>
     </BootstrapTable>
       </div>
     );
