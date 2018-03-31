@@ -10,9 +10,21 @@ const myData = {
 }
 
 class App extends Component {
+  constructor(props){
+    super(props);
+    this.setState({
+      update:false
+    });
+  }
 
   rowClickHandler = (row, columnIndex, rowIndex, e) => {
     myData.index = rowIndex
+  }
+
+  updateParent = () => {
+    this.setState({
+      update:true
+    });
   }
 
   render() {
@@ -48,21 +60,21 @@ class App extends Component {
     return (
       <div padding= "35px">
         <BootstrapTable data={myData.data } striped={true} pagination={ true } options={ options } >
-        <TableHeaderColumn dataField='id' width="34%" isKey={ true }>ID</TableHeaderColumn>
+        <TableHeaderColumn dataField='id' width="33%" isKey={ true }>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='name' width="33%" filter={ { type: 'TextFilter', delay: 10 } }>Name</TableHeaderColumn>
         <TableHeaderColumn dataField='regions' width="33%" filter={ { type: 'TextFilter', delay: 10 } }>Regions</TableHeaderColumn>
     </BootstrapTable>
 
     <Router>
           <div>
-            <ul>
-          <li><Link to="/add">Add</Link></li>
-          <li><Link to="/edit" >Edit</Link></li>
-          <li><Link to="/delete">Delete</Link></li>
+            <ul class="links">
+          <li class="links"><Link to="/add">Add</Link></li>
+          <li class="links"><Link to="/edit" >Edit</Link></li>
+          <li class="links"><Link to="/delete">Delete</Link></li>
           </ul>
-          <Route path="/add" component={AddNewRow}/>
-          <Route path="/edit" component={EditExistingRow}/>
-          <Route path="/delete" component={DeleteExistingRow}/>
+          <Route path="/add" component={(props) => <AddNewRow {...props} updateParent={this.updateParent.bind(this)}/>} />
+          <Route path="/edit" component={(props) => <EditExistingRow {...props} updateParent={this.updateParent.bind(this)}/>} />
+          <Route path="/delete" component={(props) => <DeleteExistingRow {...props} updateParent={this.updateParent.bind(this)}/>} />
          </div>
          </Router>
 
@@ -74,8 +86,8 @@ class App extends Component {
 // More components
 class AddNewRow extends Component {
   
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
       this.goBack = this.goBack.bind(this);
       this.state = {
         name: '',
@@ -84,7 +96,9 @@ class AddNewRow extends Component {
       };
     }
 
-    goBack(){
+    goBack = (e) => {
+      e.preventDefault();
+      this.props.updateParent();
       this.props.history.goBack();
     }
   
@@ -94,24 +108,25 @@ class AddNewRow extends Component {
       this.setState(state);
     }
   
-    handleOnClick = () => {
+    handleOnClick = (e) => {
+      e.preventDefault();
       var newJson = {"name" : this.state.name,
                       "id" : this.state.id,
                       "regions" : this.state.regions}
       myData.data.push(newJson);
-      this.goBack();
+      this.goBack(e);
     }
   
     render(){        
         return (
-          <div padding = "135px">
+          <div padding = "35px">
           <h3>Add record</h3>
             <form>
-              Name:<br/>
+            &nbsp; Name:<br/>
               <input type="text" name="name" onChange={this.onChange}/><br/>
-              Id: <br/>
+              &nbsp;Id: <br/>
               <input type="text" name="id" onChange={this.onChange}/><br/>
-              Regions: <br/>
+              &nbsp;Regions: <br/>
               <input type="text" name="regions" onChange={this.onChange}/><br/><br/>
               <input type="submit" value="Submit" onClick={this.handleOnClick.bind(this)}/>
               &nbsp;&nbsp;<input type="submit" value = "Back" onClick={this.goBack}/>
@@ -126,9 +141,13 @@ class DeleteExistingRow extends Component {
     super(props);
     this.goBack = this.goBack.bind(this); 
   }
-  goBack(){
-    this.props.history.goBack();
+
+  goBack = (e) => {
+      e.preventDefault();
+      this.props.updateParent();
+      this.props.history.goBack();
   }
+
   render(){
     if( myData.index !== -1){
       var row = myData.data[myData.index];
@@ -141,11 +160,11 @@ class DeleteExistingRow extends Component {
          <div>
         <h3>Deleted record</h3>
             <form>
-              Name:<br/>
+            &nbsp;Name:<br/>
               <input readonly type="text" name="name" value = {row.name}/><br/>
-              Id: <br/>
+              &nbsp;Id: <br/>
               <input readonly type="text" name="id" value = {row.id}/><br/>
-              Regions: <br/>
+              &nbsp;Regions: <br/>
               <input readonly type="text" name="regions" value = {row.regions}/><br/><br/>
               <input type="submit" value = "Back" onClick={this.goBack}/>
           </form> 
@@ -181,19 +200,22 @@ class EditExistingRow extends Component {
     this.setState(state);
   }
 
-  handleOnClick = () => {
+  handleOnClick = (e) => {
+    e.preventDefault();
     var newJson = {"name" : this.state.name,
                     "id" : this.state.id,
                     "regions" : this.state.regions}
     myData.data.push(newJson);
+    this.goBack(e);
   }
 
-  goBack(){
+  goBack = (e) => {
+    e.preventDefault();
+    this.props.updateParent();
     this.props.history.goBack();
   }
 
   render(){
-   
     var myIndex = myData.index;
    
     if(myIndex !== -1){
@@ -211,11 +233,11 @@ class EditExistingRow extends Component {
         <div>
         <h3>Edit record</h3>
         <form>
-              Name:<br/>
+        &nbsp;Name:<br/>
               <input type="text" name="name" value={this.state.name} onChange={this.onChange}/><br/>
-              Id: <br/>
+              &nbsp; Id: <br/>
               <input type="text" name="id" value={this.state.id} onChange={this.onChange}/><br/>
-              Regions: <br/>
+              &nbsp; Regions: <br/>
               <input type="text" name="regions" value={this.state.regions} onChange={this.onChange}/><br/><br/>
               <input type="submit" value="Submit" onClick={this.handleOnClick.bind(this)}/>
               &nbsp;&nbsp;<input type="submit" value = "Back" onClick={this.goBack}/>
