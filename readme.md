@@ -31,6 +31,9 @@ Normally you would be querying for data but we have provided a json file (player
 
 ### Final steps before you submit:
 Please list build and run steps here:
+1. cd players-app
+2. npm start
+3. type localhost:3000 in the browser
 
 
 _P.S: Feel free to add any other bonus functionality you can think of_
